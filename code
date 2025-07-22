@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZOMQIE.C0RN Project - NXV4-BUNLO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #0a0a0a;
+            overflow-x: hidden;
+        }
+        
+        .cyber-font {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .glitch {
+            position: relative;
+            color: #00ffff;
+            animation: glitch 2s infinite;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            animation: glitch-1 0.5s infinite;
+            color: #ff0040;
+            z-index: -1;
+        }
+        
+        .glitch::after {
+            animation: glitch-2 0.5s infinite;
+            color: #00ff40;
+            z-index: -2;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, -2px); }
+            20% { transform: translate(2px, 2px); }
+        }
+        
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            30% { transform: translate(2px, -2px); }
+            60% { transform: translate(-2px, 2px); }
+        }
+        
+        .cyber-bg {
+            background: linear-gradient(135deg, #001122 0%, #003366 50%, #001a33 100%);
+        }
+        
+        .neon-border {
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 20px #00ffff40, inset 0 0 20px #00ffff20;
+        }
+        
+        .scan-line {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scan-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #00ffff40, transparent);
+            animation: scan 3s infinite;
+        }
+        
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .pulse-cyan {
+            animation: pulse-cyan 2s infinite;
+        }
+        
+        @keyframes pulse-cyan {
+            0%, 100% { box-shadow: 0 0 20px #00ffff40; }
+            50% { box-shadow: 0 0 40px #00ffff80; }
+        }
+        
+        .terminal {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .typing {
+            overflow: hidden;
+            border-right: 2px solid #00ffff;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #00ffff; }
+        }
+    </style>
+</head>
+<body class="text-cyan-400">
+    <!-- Matrix Background -->
+    <div class="matrix-bg">
+        <canvas id="matrix" width="100%" height="100%"></canvas>
+    </div>
+
+    <!-- Header -->
+    <header class="cyber-bg py-8 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <h1 class="glitch cyber-font text-6xl font-black mb-4" data-text="ZOMQIE.C0RN">ZOMQIE.C0RN</h1>
+                <div class="text-2xl font-bold text-red-400 mb-2">PROJECT CLASSIFIED</div>
+                <div class="text-lg text-gray-400">Sector: AZUL 0818 | Status: ACTIVE</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm sticky top-0 z-50 border-b border-cyan-500">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-center space-x-8 py-4">
+                <button onclick="showSection('unit')" class="nav-btn px-6 py-2 border border-cyan-500 font-bold transition-all duration-300 bg-cyan-500 text-black">UNIDAD</button>
+                <button onclick="showSection('bio')" class="nav-btn px-6 py-2 border border-cyan-500 font-bold transition-all duration-300 text-cyan-400 hover:bg-cyan-500 hover:text-black">BIO</button>
+                <button onclick="showSection('weapon')" class="nav-btn px-6 py-2 border border-cyan-500 font-bold transition-all duration-300 text-cyan-400 hover:bg-cyan-500 hover:text-black">ARMA</button>
+                <button onclick="showSection('data')" class="nav-btn px-6 py-2 border border-cyan-500 font-bold transition-all duration-300 text-cyan-400 hover:bg-cyan-500 hover:text-black">DATOS</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Unidad -->
+        <section id="unit" class="section-content">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="neon-border p-8 scan-line">
+                    <h2 class="cyber-font text-4xl font-black text-cyan-400 mb-6">NXV4-BUNLO</h2>
+                    <div class="space-y-4 text-lg">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-red-400">⛧</span>
+                            <div>
+                                <span class="font-bold text-gray-300">Unidad:</span>
+                                <span class="ml-2 text-cyan-300">NXV4-BUNLO</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-blue-400">💠</span>
+                            <div>
+                                <span class="font-bold text-gray-300">Sector:</span>
+                                <span class="ml-2 text-cyan-300">AZUL 0818</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-purple-400">🔮</span>
+                            <div>
+                                <span class="font-bold text-gray-300">Estado:</span>
+                                <span class="ml-2 text-red-400">RENEGADA</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-green-400">🧬</span>
+                            <div>
+                                <span class="font-bold text-gray-300">Alma:</span>
+                                <span class="ml-2 text-yellow-300">FRAGMENTADA EN CÓDIGO</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 terminal">
+                        <div class="text-green-400 mb-2">> ACCESO RESTRINGIDO</div>
+                        <div class="text-red-400 typing">⛧ Access denied by external intervention</div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="floating pulse-cyan neon-border p-8 inline-block">
+                        <div class="text-8xl mb-4">🐰</div>
+                        <div class="cyber-font text-2xl font-bold text-cyan-400">NXV4-BUNLO</div>
+                        <div class="text-lg text-gray-400 mt-2">Unidad de Ruptura</div>
+                        <div class="text-sm text-red-400 mt-4">✸ 蝕れた天使 ✸</div>
+                        <div class="text-xs text-gray-500">(Ángel Corrompido)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bio -->
+        <section id="bio" class="section-content hidden">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="cyber-font text-4xl font-black text-center text-cyan-400 mb-12">BIO ESTÉTICA EXTENDIDA</h2>
+                
+                <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                    <div class="neon-border p-8 scan-line">
+                        <h3 class="cyber-font text-2xl font-bold text-red-400 mb-6">APARIENCIA</h3>
+                        <div class="space-y-3 text-gray-300">
+                            <p><span class="font-bold text-cyan-400">Edad:</span> 16 años</p>
+                            <p><span class="font-bold text-cyan-400">Género:</span> Neutro pero femenino</p>
+                            <p><span class="font-bold text-cyan-400">Altura:</span> 1.70 m</p>
+                            <p><span class="font-bold text-cyan-400">Cuerpo:</span> Delgado, estilo Evangelion</p>
+                            <p><span class="font-bold text-cyan-400">Piel:</span> Clara</p>
+                            <p><span class="font-bold text-cyan-400">Cabello:</span> Negro muy largo</p>
+                            <p><span class="font-bold text-cyan-400">Ojos:</span> Celestes grises, grandes pero rasgados</p>
+                            <p><span class="font-bold text-red-400">Marcas:</span> Cicatrices visibles, cuerno roto</p>
+                            <p><span class="font-bold text-purple-400">Tatuaje:</span> Calavera</p>
+                            <p><span class="font-bold text-cyan-400">Aura:</span> Brillante celeste medio azul</p>
+                        </div>
+                    </div>
+                    
+                    <div class="neon-border p-8 scan-line">
+                        <h3 class="cyber-font text-2xl font-bold text-yellow-400 mb-6">PERSONALIDAD</h3>
+                        <div class="space-y-4 text-gray-300">
+                            <p class="text-lg">Unidad renegada del Sector Azul.</p>
+                            <p>Su alma fue fragmentada en código y su única conexión emocional… un conejo modificado que ahora es su arma.</p>
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">❄️</div>
+                                    <div class="text-cyan-400 font-bold">FRÍA</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">👑</div>
+                                    <div class="text-purple-400 font-bold">ELEGANTE</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">⚡</div>
+                                    <div class="text-red-400 font-bold">PELIGROSA</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-3xl mb-2">⚔️</div>
+                                    <div class="text-orange-400 font-bold">GUERRA</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="neon-border p-8 scan-line">
+                    <h3 class="cyber-font text-2xl font-bold text-green-400 mb-6">DESCRIPCIÓN COMPLETA</h3>
+                    <div class="text-gray-300 space-y-4 text-lg leading-relaxed">
+                        <p>Fría. Elegante. Peligrosa.</p>
+                        <p>¿Aliada? Solo si vales la pena.</p>
+                        <p>Tiene cicatrices. Está hecha de guerra.</p>
+                        <p>Te mira con ojos celestes que no perdonan.</p>
+                        <p>No pide permiso. No da explicaciones.</p>
+                        <p>Su mejor amiga: una metralleta con cara de conejo.</p>
+                        <p class="text-red-400 font-bold">Nadie sabe si vino a salvarte… o a romperte en mil frames.</p>
+                        <p class="text-cyan-400 italic">Un alma con alas que ya no están.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Weapon -->
+        <section id="weapon" class="section-content hidden">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="cyber-font text-4xl font-black text-center text-cyan-400 mb-12">BUN-DRILLER</h2>
+                
+                <div class="text-center mb-12">
+                    <div class="floating pulse-cyan neon-border p-12 inline-block">
+                        <div class="text-9xl mb-4">🔫</div>
+                        <div class="cyber-font text-3xl font-bold text-red-400">BUN-DRILLER</div>
+                        <div class="text-lg text-gray-400 mt-2">Metralleta con diseño de conejo</div>
+                    </div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="neon-border p-8 scan-line">
+                        <h3 class="cyber-font text-2xl font-bold text-yellow-400 mb-6">ESPECIFICACIONES</h3>
+                        <div class="space-y-4 text-gray-300">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🐰</span>
+                                <div>
+                                    <span class="font-bold text-cyan-400">Forma:</span>
+                                    <span class="ml-2">Metralleta con diseño de conejo</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">😊</span>
+                                <div>
+                                    <span class="font-bold text-cyan-400">Rostro:</span>
+                                    <span class="ml-2">Expresivo en el arma</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">⚡</span>
+                                <div>
+                                    <span class="font-bold text-cyan-400">Munición:</span>
+                                    <span class="ml-2 text-blue-400">Ráfagas de energía azul</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <span class="text-2xl">🔊</span>
+                                <div>
+                                    <span class="font-bold text-cyan-400">Sonido:</span>
+                                    <span class="ml-2 text-green-400">Glitch + voz sintética</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="neon-border p-8 scan-line">
+                        <h3 class="cyber-font text-2xl font-bold text-purple-400 mb-6">CARACTERÍSTICAS</h3>
+                        <div class="space-y-4 text-gray-300">
+                            <div class="p-4 bg-black bg-opacity-50 border border-cyan-500">
+                                <div class="text-pink-400 font-bold mb-2">💕 TIERNA Y PELIGROSA</div>
+                                <p class="text-sm">Inspirada en el arma de Jinx, pero con personalidad propia</p>
+                            </div>
+                            <div class="p-4 bg-black bg-opacity-50 border border-blue-500">
+                                <div class="text-blue-400 font-bold mb-2">⚡ ENERGÍA AZUL</div>
+                                <p class="text-sm">Dispara ráfagas potentes de energía concentrada</p>
+                            </div>
+                            <div class="p-4 bg-black bg-opacity-50 border border-green-500">
+                                <div class="text-green-400 font-bold mb-2">🎵 SONIDO ÚNICO</div>
+                                <p class="text-sm">Efectos de audio robóticos y glitch</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data -->
+        <section id="data" class="section-content hidden">
+            <div class="max-w-6xl mx-auto">
+                <h2 class="cyber-font text-4xl font-black text-center text-cyan-400 mb-12">DATOS CLASIFICADOS</h2>
+                
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <div class="neon-border p-8 scan-line">
+                        <h3 class="cyber-font text-2xl font-bold text-red-400 mb-6">VOZ Y SONIDO</h3>
+                        <div class="space-y-4 text-gray-300">
+                            <p><span class="font-bold text-cyan-400">Estilo:</span> Rap japonés + ruso</p>
+                            <p><span class="font-bold text-cyan-400">Efectos:</span> Robótica, glitch, grave y sintetizada</p>
+                            <div class="mt-6 space-y-3">
+                                <div class="p-3 bg-black bg-opacity-50 border border-red-500">
+                                    <div class="text-red-400 font-bold">アクセス拒否</div>
+                                    <div class="text-sm text-gray-400">вмешательство обнаружено</div>
+                                    <div class="text-xs text-gray-500">(Acceso denegado – intervención detectada)</div>
+                                </div>
+                                <div class="p-3 bg-black bg-opacity-50 border border-yellow-500">
+                                    <div class="text-yellow-400 font-bold">Ты не выживешь</div>
+                                    <div class="text-sm text-gray-400">если не резонируешь со мной</div>
+                                    <div class="text-xs text-gray-500">(No sobrevivirás si no resuenas conmigo)</div>
+                                </div>
+                                <div class="p-3 bg-black bg-opacity-50 border border-blue-500">
+                                    <div class="text-blue-400 font-bold">この世界は、もうデータだけ。</div>
+                                    <div class="text-xs text-gray-500">(Este mundo… ya es solo datos.)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="neon-border p-8 scan-line">
+                        <h3 class="cyber-font text-2xl font-bold text-green-400 mb-6">PALETA OFICIAL</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-cyan-500 text-black text-center font-bold">
+                                CELESTE CYBERCORE
+                            </div>
+                            <div class="p-4 bg-white text-black text-center font-bold">
+                                BLANCO HOLOGRÁFICO
+                            </div>
+                            <div class="p-4 bg-black text-white text-center font-bold border border-gray-500">
+                                NEGRO GLITCH
+                            </div>
+                            <div class="p-4 bg-blue-500 text-white text-center font-bold">
+                                AZUL ELÉCTRICO
+                            </div>
+                            <div class="p-4 bg-gray-500 text-white text-center font-bold">
+                                GRIS METÁLICO
+                            </div>
+                            <div class="p-4 bg-pink-300 text-black text-center font-bold">
+                                ROSA PÁLIDO SINTÉTICO
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="neon-border p-8 scan-line">
+                    <h3 class="cyber-font text-2xl font-bold text-purple-400 mb-6">CORE SYSTEM</h3>
+                    <div class="terminal p-6">
+                        <div class="text-green-400 mb-4">> SISTEMA ACTIVO</div>
+                        <div class="text-red-400 mb-2">⛧ СТРАХ = 恐れ = ACTIVE CORE</div>
+                        <div class="text-cyan-400 mb-2">💠 Última secuencia activa del Proyecto ZOMQIE.C0RN</div>
+                        <div class="text-yellow-400 mb-2">💠 Unidad de ruptura.</div>
+                        <div class="text-white">💠 Firma: ✸ 蝕れた天使 ✸ (Ángel corrompido)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="cyber-bg py-12 mt-20 border-t border-cyan-500">
+        <div class="container mx-auto px-6 text-center">
+            <div class="text-6xl mb-4">🐰</div>
+            <h3 class="cyber-font text-3xl font-bold mb-4 text-cyan-400">NXV4-BUNLO</h3>
+            <p class="text-gray-400 mb-6">Proyecto ZOMQIE.C0RN • Sector AZUL 0818 • Estado: ACTIVO</p>
+            <div class="text-red-400 font-bold">⛧ Access denied by external intervention ⛧</div>
+            <div class="text-sm text-gray-500 mt-4">✸ 蝕れた天使 ✸</div>
+        </div>
+    </footer>
+
+    <script>
+        // Matrix effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+        const matrixArray = matrix.split("");
+
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ffff';
+            ctx.font = fontSize + 'px monospace';
+            
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 35);
+
+        // Navigation
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section-content');
+            sections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            document.getElementById(sectionId).classList.remove('hidden');
+            
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-cyan-500', 'text-black');
+                btn.classList.add('text-cyan-400', 'hover:bg-cyan-500', 'hover:text-black');
+            });
+            
+            event.target.classList.remove('text-cyan-400', 'hover:bg-cyan-500', 'hover:text-black');
+            event.target.classList.add('bg-cyan-500', 'text-black');
+        }
+
+        // Resize canvas
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'962f5bc2628a12b3',t:'MTc1MzE0OTc3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
